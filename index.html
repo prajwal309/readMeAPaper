@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f8fa" />
+    <title>sonora — listen to research</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a href="#" class="brand" aria-label="Sonora home"><span class="brand-mark"><i></i><i></i><i></i></span><span>sonora</span></a>
+        <nav class="top-nav" aria-label="Main navigation"><a class="active" href="#reader">Reader</a><a href="#library">Library</a><a href="#settings">Settings</a></nav>
+        <div class="top-actions"><button class="icon-btn" aria-label="Search" id="searchBtn">⌕</button><button class="avatar" aria-label="Profile">JD</button></div>
+      </header>
+
+      <main>
+        <section class="hero" id="reader">
+          <div class="eyebrow"><span class="pulse-dot"></span> Your research, in your ears</div>
+          <h1>Read less.<br /><em>Understand more.</em></h1>
+          <p class="hero-copy">Turn any arXiv paper into a natural, thoughtful listening experience. Start with a link and let Sonora do the rest.</p>
+          <form class="url-form" id="urlForm">
+            <div class="input-wrap"><span class="link-symbol">↗</span><input id="urlInput" type="text" autocomplete="off" placeholder="Paste an arXiv link" aria-label="Paste an arXiv link" value="https://arxiv.org/abs/2501.12345" /><button type="button" class="clear-btn" id="clearBtn" aria-label="Clear">×</button></div>
+            <button class="primary-btn" type="submit"><span>Listen to paper</span><span class="arrow">↗</span></button>
+          </form>
+          <div class="quick-hint"><span>⌘</span> Try an arXiv URL or ID <span class="hint-example">2501.12345</span></div>
+        </section>
+
+        <section class="workspace" id="library">
+          <div class="paper-column">
+            <div class="paper-head">
+              <div><div class="label">NOW PLAYING <span class="live-line"></span></div><h2 id="paperTitle">The surprising effectiveness of scaling laws<br class="desktop-only" /> in neural language models</h2><p id="paperAuthors">A. Kaplan, S. McCandlish, T. Henighan &nbsp;·&nbsp; 2020</p></div>
+              <button class="save-btn" id="saveBtn">♡ <span>Save</span></button>
+            </div>
+            <div class="paper-tags"><span>arXiv: <b id="paperId">2001.08361</b></span><span>12 min read</span><span>Machine Learning</span></div>
+            <div class="abstract-card"><div class="label">ABSTRACT</div><p id="abstractText">Recent work has demonstrated impressive performance gains from increasing the scale of language models. We study how these gains depend on model size, dataset size, and compute, finding simple power-law relationships that span more than seven orders of magnitude.</p><button class="text-btn" id="abstractBtn">Read abstract <span>→</span></button></div>
+            <div class="section-heading"><div><div class="label">PAPER CONTENT</div><h3>Listen in order, or jump around</h3></div><button class="filter-btn">⌄ <span>All sections</span></button></div>
+            <div class="section-list" id="sectionList"></div>
+          </div>
+          <aside class="right-rail">
+            <div class="rail-card mode-card"><div class="card-heading"><span>Listening mode</span><button class="more-btn">•••</button></div><div class="mode-tabs"><button class="mode active" data-mode="full">Full paper</button><button class="mode" data-mode="essential">Essential</button><button class="mode" data-mode="summary">Summary</button></div><p id="modeDescription">The complete paper, narrated clearly and at a comfortable pace.</p></div>
+            <div class="rail-card"><div class="card-heading"><span>Voice</span><button class="preview-btn" id="previewBtn">▶ Preview</button></div><div class="voice-list"><button class="voice selected" data-voice="Sage"><span class="voice-icon sage">S</span><span><b>Sage</b><small>Warm · thoughtful</small></span><i>✓</i></button><button class="voice" data-voice="Ember"><span class="voice-icon ember">E</span><span><b>Ember</b><small>Clear · measured</small></span><i>✓</i></button></div><div class="speed-row"><span>Reading speed</span><div class="speed-options"><button>0.75×</button><button class="selected">1×</button><button>1.25×</button><button>1.5×</button><button>2×</button></div></div></div>
+            <div class="rail-card settings-card"><div class="card-heading"><span>Narration settings</span><button class="chevron">⌃</button></div><label class="setting"><span>Read figure captions</span><input type="checkbox" checked /><i></i></label><label class="setting"><span>Read table captions</span><input type="checkbox" checked /><i></i></label><div class="citation-setting"><span>Citations</span><select><option>Short citations</option><option>Skip citations</option><option>Full citations</option></select></div></div>
+            <div class="tip-card"><span class="bulb">✦</span><div><b>Made for focus</b><p>Equations are translated into natural language, so you can stay in the flow.</p></div></div>
+          </aside>
+        </section>
+      </main>
+
+      <footer class="player" id="player">
+        <div class="player-paper"><div class="mini-art"><span></span><span></span><span></span><span></span></div><div><small>NOW PLAYING</small><b id="playerTitle">The surprising effectiveness of scaling laws</b><span id="playerSection">Abstract</span></div></div>
+        <div class="player-controls"><div class="control-buttons"><button class="skip" id="backBtn">↶<small>15</small></button><button class="play-btn" id="playBtn">▶</button><button class="skip" id="nextBtn">↷<small>15</small></button></div><div class="timeline"><span id="currentTime">00:00</span><div class="progress-track" id="progressTrack"><div class="progress" id="progress"></div><div class="scrubber"></div></div><span id="remainingTime">–12:40</span></div></div>
+        <div class="player-end"><button class="player-speed">1×⌄</button><button class="volume">◖</button><div class="waveform" aria-hidden="true"></div><button class="queue">☰</button></div>
+      </footer>
+    </div>
+    <div class="toast" id="toast" role="status"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
