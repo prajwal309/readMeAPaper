@@ -22,12 +22,21 @@
         <section class="hero" id="reader">
           <div class="eyebrow"><span class="pulse-dot"></span> Your research, in your ears</div>
           <h1>Read less.<br /><em>Understand more.</em></h1>
-          <p class="hero-copy">Turn any arXiv paper into a natural, thoughtful listening experience. Start with a link and let Sonora do the rest.</p>
+          <p class="hero-copy">Turn Earth science and astronomy research into a natural, thoughtful listening experience. Choose a recent paper or start with any arXiv link.</p>
           <form class="url-form" id="urlForm">
             <div class="input-wrap"><span class="link-symbol">↗</span><input id="urlInput" type="text" autocomplete="off" placeholder="Paste an arXiv link" aria-label="Paste an arXiv link" value="https://arxiv.org/abs/2501.12345" /><button type="button" class="clear-btn" id="clearBtn" aria-label="Clear">×</button></div>
             <button class="primary-btn" type="submit"><span>Listen to paper</span><span class="arrow">↗</span></button>
           </form>
           <div class="quick-hint"><span>⌘</span> Try an arXiv URL or ID <span class="hint-example">2501.12345</span></div>
+          <div class="stream-picker" aria-label="Research streams">
+            <div class="stream-picker-heading"><div><div class="label">CHOOSE A RESEARCH STREAM</div><h2>Start with the sky, the Earth, or both.</h2></div><a href="https://arxiv.org/list/astro-ph.EP/recent" target="_blank" rel="noreferrer">View on arXiv ↗</a></div>
+            <button class="stream-card active" type="button" data-category="astro-ph.EP"><span class="stream-icon orbit">◌</span><span><b>Earth &amp; planetary science</b><small>Recent papers from Astro-ph.EP</small></span><i>✓</i></button>
+            <button class="stream-card" type="button" data-category="all"><span class="stream-icon stars">✦</span><span><b>All astronomy &amp; Earth science</b><small>Explore the wider arXiv universe</small></span><i>✓</i></button>
+          </div>
+          <div class="recent-shelf" id="recentShelf" aria-live="polite">
+            <div class="recent-heading"><div><div class="label">RECENT TARGETS</div><h3>Pick a paper to listen to</h3></div><span id="recentStatus">Loading Astro-ph.EP…</span></div>
+            <div class="recent-list" id="recentList"><div class="recent-loading">Fetching the latest Earth and planetary science papers…</div></div>
+          </div>
         </section>
 
         <section class="workspace" id="library">

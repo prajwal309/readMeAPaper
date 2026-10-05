@@ -175,10 +175,58 @@ function parseArxivMetadata(xml) {
   return { title, authors, abstract };
 }
 
+function escapeHtml(value) {
+  return String(value || '').replace(/[&<>'"]/g, (character) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;',
+  }[character]));
+}
+
+function parseRecentPapers(xml) {
+  const documentXml = new DOMParser().parseFromString(xml, 'application/xml');
+  return [...documentXml.querySelectorAll('entry')].map((entry) => {
+    const id = entry.querySelector('id')?.textContent.match(/([0-9]{4}\.\d{4,5})(?:v\d+)?$/i)?.[1];
+    return {
+      id,
+      title: entry.querySelector('title')?.textContent.replace(/\s+/g, ' ').trim(),
+      authors: [...entry.querySelectorAll('author name')].slice(0, 3).map((author) => author.textContent).join(', '),
+    };
+  }).filter((paper) => paper.id && paper.title);
+}
+
+async function loadRecentPapers(category = 'astro-ph.EP') {
+  const list = $('#recentList');
+  $('#recentStatus').textContent = category === 'all' ? 'Loading astronomy & Earth science…' : 'Loading Astro-ph.EP…';
+  list.innerHTML = '<div class="recent-loading">Fetching the latest research targets…</div>';
+
+  try {
+    const response = await fetch(`/api/arxiv/recent?category=${encodeURIComponent(category)}`);
+    if (!response.ok) throw new Error('Recent feed unavailable');
+    const papers = parseRecentPapers(await response.text());
+    if (!papers.length) throw new Error('No recent papers returned');
+    list.innerHTML = papers.map((paper) => `
+      <button class="recent-paper" type="button" data-paper-id="${escapeHtml(paper.id)}">
+        <span class="paper-category">${category === 'all' ? 'Astronomy & Earth science' : 'Astro-ph.EP · recent'}</span>
+        <h4>${escapeHtml(paper.title)}</h4>
+        <p>${escapeHtml(paper.authors || 'arXiv authors')} · ${escapeHtml(paper.id)}</p>
+      </button>`).join('');
+    $('#recentStatus').textContent = `${papers.length} fresh targets`;
+    document.querySelectorAll('.recent-paper').forEach((button) => {
+      button.addEventListener('click', () => {
+        $('#urlInput').value = `https://arxiv.org/abs/${button.dataset.paperId}`;
+        loadPaper(null, button.dataset.paperId);
+        $('#library').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  } catch (error) {
+    list.innerHTML = '<div class="recent-loading">The live feed is unavailable right now. You can still paste an arXiv link above.</div>';
+    $('#recentStatus').textContent = 'Feed unavailable';
+  }
+}
+
 /** Load paper metadata without making the interface depend on the network. */
-async function loadPaper(event) {
-  event.preventDefault();
-  const id = normalizeArxivId($('#urlInput').value);
+async function loadPaper(event, selectedId = null) {
+  event?.preventDefault();
+  const id = selectedId || normalizeArxivId($('#urlInput').value);
 
   if (!id) {
     showToast('Please enter a valid arXiv ID or URL');
@@ -308,6 +356,15 @@ $('#previewBtn').addEventListener('click', () => {
 });
 $('#searchBtn').addEventListener('click', () => showToast('Search is coming to your library'));
 
+document.querySelectorAll('.stream-card').forEach((button) => {
+  button.addEventListener('click', () => {
+    document.querySelectorAll('.stream-card').forEach((item) => item.classList.remove('active'));
+    button.classList.add('active');
+    loadRecentPapers(button.dataset.category);
+  });
+});
+
 // Initial render: the demo is ready before a network request is made.
 renderSections();
 updatePlayer();
+loadRecentPapers();

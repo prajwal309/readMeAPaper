@@ -6,13 +6,15 @@ Run with: python3 server.py
 """
 
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, quote, urlparse
 from urllib.request import Request, urlopen
 import re
 
 
 ARXIV_API = "https://export.arxiv.org/api/query?id_list={}"
+ARXIV_RECENT_API = "https://export.arxiv.org/api/query?search_query={}&start=0&max_results=6&sortBy=submittedDate&sortOrder=descending"
 ARXIV_ID = re.compile(r"^[0-9]{4}\.[0-9]{4,5}$")
+ARXIV_CATEGORY = re.compile(r"^(astro-ph\.EP|all)$")
 
 
 class SonoraHandler(SimpleHTTPRequestHandler):
@@ -23,6 +25,10 @@ class SonoraHandler(SimpleHTTPRequestHandler):
 
         if request.path == "/api/arxiv":
             self.proxy_arxiv(parse_qs(request.query).get("id", [""])[0])
+            return
+
+        if request.path == "/api/arxiv/recent":
+            self.proxy_recent(parse_qs(request.query).get("category", ["astro-ph.EP"])[0])
             return
 
         super().do_GET()
@@ -36,6 +42,31 @@ class SonoraHandler(SimpleHTTPRequestHandler):
         try:
             request = Request(
                 ARXIV_API.format(paper_id),
+                headers={"User-Agent": "Sonora paper reader/1.0"},
+            )
+            with urlopen(request, timeout=20) as upstream:
+                payload = upstream.read()
+        except Exception as error:  # pragma: no cover - network dependent
+            self.send_error(502, f"Could not reach arXiv: {error}")
+            return
+
+        self.send_response(200)
+        self.send_header("Content-Type", "application/atom+xml; charset=utf-8")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Content-Length", str(len(payload)))
+        self.end_headers()
+        self.wfile.write(payload)
+
+    def proxy_recent(self, category):
+        """Return a small recent-paper feed for the landing page."""
+        if not ARXIV_CATEGORY.fullmatch(category):
+            self.send_error(400, "Invalid arXiv category")
+            return
+
+        search = "cat:" + category if category != "all" else "cat:astro-ph.*"
+        try:
+            request = Request(
+                ARXIV_RECENT_API.format(quote(search, safe="")),
                 headers={"User-Agent": "Sonora paper reader/1.0"},
             )
             with urlopen(request, timeout=20) as upstream:
